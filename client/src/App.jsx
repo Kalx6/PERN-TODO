@@ -8,6 +8,7 @@ function App() {
   const [todos, setTodos] = useState([]);
   const [editingTodo, setEditingTodo] = useState(null);
   const [editedTodo, setEditedTodo] = useState("");
+  const [errors, setErrors] = useState(null);
 
   const onSubmitForm = async (e) => {
     e.preventDefault();
@@ -19,19 +20,21 @@ function App() {
     getTodos();
 
     try {
-    } catch (error) {
-      console.log(error.message);
+    } catch (err) {
+      console.log(err.message);
     }
   };
 
   // getTodos();
   const getTodos = async () => {
     try {
+      setErrors(null);
       const res = await axios("http://localhost:5000/todo");
-      console.log(res.data);
+      // console.log(res.data);
       setTodos(res.data);
-    } catch (error) {
-      console.log(error.message);
+    } catch (err) {
+      console.log(err.message);
+      setErrors("Failed to fetch todos. Please try again later.");
     }
   };
 
@@ -41,14 +44,23 @@ function App() {
 
   const saveTodo = async (id) => {
     try {
+      const currentTodo = todos.find((todo) => todo.todo_id === id);
+      const trimmedText = editedTodo.trim();
+
+      if (currentTodo.description === trimmedText) {
+        setEditingTodo(null);
+        setEditedTodo("");
+        return;
+      }
       axios.put(`http://localhost:5000/todo/${id}`, {
         description: editedTodo,
       });
       setEditingTodo(null);
       setEditedTodo("");
       getTodos();
-    } catch (error) {
-      console.log(error.message);
+    } catch (err) {
+      console.log(err.message);
+      setErrors("Failed to update todo");
     }
   };
 
@@ -56,8 +68,26 @@ function App() {
     try {
       axios.delete(`http://localhost:5000/todo/${id}`);
       setTodos(todos.filter((todo) => todo.todo_id !== id));
-    } catch (error) {
-      console.log(error.message);
+    } catch (err) {
+      console.log(err.message);
+      setErrors("Failed to delete todo");
+    }
+  };
+
+  const toggleCompleted = async (id) => {
+    try {
+      const todo = todos.find((todo) => todo.todo_id === id);
+      await axios.put(`http://localhost:5000/todo/${id}`, {
+        description: todo.description,
+        completed: !todo.completed,
+      });
+      setTodos(
+        todos.map((todo) =>
+          todo.todo_id === id ? { ...todo, completed: !todo.completed } : todo,
+        ),
+      );
+    } catch (err) {
+      console.log(err.message);
     }
   };
 
@@ -67,6 +97,11 @@ function App() {
         <h1 className="text-4xl text-center mb-8 font-bold text-gray-800">
           PERN TODO APP
         </h1>
+        {errors && (
+          <div>
+            <p className="text-red-500 ">{errors}</p>
+          </div>
+        )}
         <form
           onSubmit={onSubmitForm}
           className="flex items-center gap-2 shadow-md mb-6 border-b-1 border-blue-500 rounded-md "
@@ -115,9 +150,10 @@ function App() {
                     </div>
                   ) : (
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-x-4 ">
+                      <div className="flex items-center gap-x-4 overflow-hidden ">
                         <button
-                          className={`h-6 w-6 border-2 rounded-full flex items-center justify-center cursor-pointer ${todo.completed ? "bg-green-500 border-green-500 text-white" : "border-gray-300 hover:border-blue-400"}`}
+                          onClick={() => toggleCompleted(todo.todo_id)}
+                          className={`flex-shrink-0 h-6 w-6 border-2 rounded-full flex items-center justify-center cursor-pointer ${todo.completed ? "bg-green-500 border-green-500 text-white" : "border-gray-300 hover:border-blue-400"}`}
                         >
                           {todo.completed && <Check size={16} />}
                         </button>
