@@ -24,6 +24,7 @@ function App() {
     }
   };
 
+  // getTodos();
   const getTodos = async () => {
     try {
       const res = await axios("http://localhost:5000/todo");
@@ -36,9 +37,29 @@ function App() {
 
   useEffect(() => {
     getTodos();
-  }, []);
+  }, [description, editedTodo, todos]);
 
-  // getTodos();
+  const saveTodo = async (id) => {
+    try {
+      axios.put(`http://localhost:5000/todo/${id}`, {
+        description: editedTodo,
+      });
+      setEditingTodo(null);
+      setEditedTodo("");
+      getTodos();
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const deleteTodo = async (id) => {
+    try {
+      axios.delete(`http://localhost:5000/todo/${id}`);
+      setTodos(todos.filter((todo) => todo.todo_id !== id));
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-800 flex justify-center items-center p-4">
@@ -73,12 +94,15 @@ function App() {
                     <div className="flex items-center gap-x-3">
                       <input
                         type="text"
-                        value={editedTodo.description}
-                        onChange={(e) => setDescription(e.target.value)}
+                        value={editedTodo}
+                        onChange={(e) => setEditedTodo(e.target.value)}
                         className="flex-1 p-2 border rounded-lg border-gray-200 outline-none focus:ring-2 focus:ring-blue-300 text-gray-700 shadow-inner"
                       />
                       <div>
-                        <button className="bg-green-500 py-2 px-3 mt-2 mr-1 text-white rounded-lg hover:bg-green-400 cursor-pointer">
+                        <button
+                          onClick={() => saveTodo(todo.todo_id)}
+                          className="bg-green-500 py-2 px-3 mt-2 mr-1 text-white rounded-lg hover:bg-green-400 cursor-pointer"
+                        >
                           <Check size={16} />
                         </button>
                         <button
@@ -105,11 +129,14 @@ function App() {
                             setEditingTodo(todo.todo_id);
                             setEditedTodo(todo.description);
                           }}
-                          className="p-2 text-blue-500 hover:text-blue-700 rounded-lg hover:bg-blue-50"
+                          className="p-2 text-blue-500 hover:text-blue-700 rounded-lg hover:bg-blue-50 cursor-pointer"
                         >
                           <SquarePen size={16} />
                         </button>
-                        <button className="p-2 text-red-500 hover:text-red-700 rounded-lg hover:bg-red-50">
+                        <button
+                          onClick={() => deleteTodo(todo.todo_id)}
+                          className="p-2 text-red-500 hover:text-red-700 rounded-lg hover:bg-red-50 cursor-pointer"
+                        >
                           <Trash2 size={16} />
                         </button>
                       </div>
