@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { useEffect } from "react";
+import { Check } from "lucide-react";
 
 function App() {
   const [description, setDescription] = useState("");
@@ -15,6 +16,8 @@ function App() {
       completed: false,
     });
     setDescription("");
+    getTodos();
+
     try {
     } catch (error) {
       console.log(error.message);
@@ -66,6 +69,11 @@ function App() {
             <div>
               {todos.map((todo) => (
                 <div key={todo.todo_id}>
+                  <button
+                    className={`h-6 w-6 border-2 rounded-full flex items-center justify-center cursor-pointer ${todo.completed ? "bg-green-500 border-green-500 text-white" : "border-gray-300 hover:border-blue-400"}`}
+                  >
+                    {todo.completed && <Check size={16} />}
+                  </button>
                   <span>{todo.description}</span>
                 </div>
               ))}
