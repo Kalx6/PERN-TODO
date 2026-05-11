@@ -1,12 +1,12 @@
 import { useState } from "react";
 import axios from "axios";
 import { useEffect } from "react";
-import { Check } from "lucide-react";
+import { Check, SquarePen, Trash2, X } from "lucide-react";
 
 function App() {
   const [description, setDescription] = useState("");
   const [todos, setTodos] = useState([]);
-  const [editTodo, setEditTodo] = useState(null);
+  const [editingTodo, setEditingTodo] = useState(null);
   const [editedTodo, setEditedTodo] = useState("");
 
   const onSubmitForm = async (e) => {
@@ -66,15 +66,55 @@ function App() {
           {todos.length === 0 ? (
             <p className="text-gray-600">No tasks available. Add a new task</p>
           ) : (
-            <div>
+            <div className="flex flex-col gap-y-4">
               {todos.map((todo) => (
-                <div key={todo.todo_id}>
-                  <button
-                    className={`h-6 w-6 border-2 rounded-full flex items-center justify-center cursor-pointer ${todo.completed ? "bg-green-500 border-green-500 text-white" : "border-gray-300 hover:border-blue-400"}`}
-                  >
-                    {todo.completed && <Check size={16} />}
-                  </button>
-                  <span>{todo.description}</span>
+                <div key={todo.todo_id} className="pb-4">
+                  {editingTodo === todo.todo_id ? (
+                    <div className="flex items-center gap-x-3">
+                      <input
+                        type="text"
+                        value={editedTodo.description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        className="flex-1 p-2 border rounded-lg border-gray-200 outline-none focus:ring-2 focus:ring-blue-300 text-gray-700 shadow-inner"
+                      />
+                      <div>
+                        <button className="bg-green-500 py-2 px-3 mt-2 mr-1 text-white rounded-lg hover:bg-green-400 cursor-pointer">
+                          <Check size={16} />
+                        </button>
+                        <button
+                          onClick={() => setEditingTodo(null)}
+                          className="bg-red-500 py-2 px-3 mt-2 mr-1 text-white rounded-lg hover:bg-red-400 cursor-pointer"
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-x-4 ">
+                        <button
+                          className={`h-6 w-6 border-2 rounded-full flex items-center justify-center cursor-pointer ${todo.completed ? "bg-green-500 border-green-500 text-white" : "border-gray-300 hover:border-blue-400"}`}
+                        >
+                          {todo.completed && <Check size={16} />}
+                        </button>
+                        <span>{todo.description}</span>
+                      </div>
+                      <div className="flex gap-x-2">
+                        <button
+                          onClick={() => {
+                            setEditingTodo(todo.todo_id);
+                            setEditedTodo(todo.description);
+                          }}
+                          className="p-2 text-blue-500 hover:text-blue-700 rounded-lg hover:bg-blue-50"
+                        >
+                          <SquarePen size={16} />
+                        </button>
+                        <button className="p-2 text-red-500 hover:text-red-700 rounded-lg hover:bg-red-50">
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
