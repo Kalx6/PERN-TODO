@@ -2,6 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useEffect } from "react";
 import { Check, SquarePen, Trash2, X } from "lucide-react";
+import { api_url } from "./api.js";
 
 function App() {
   const [description, setDescription] = useState("");
@@ -12,7 +13,7 @@ function App() {
 
   const onSubmitForm = async (e) => {
     e.preventDefault();
-    await axios.post("http://localhost:5000/todo", {
+    await axios.post(`${api_url}/todo`, {
       description,
       completed: false,
     });
@@ -29,7 +30,7 @@ function App() {
   const getTodos = async () => {
     try {
       setErrors(null);
-      const res = await axios("http://localhost:5000/todo");
+      const res = await axios(`${api_url}/todo`);
       // console.log(res.data);
       setTodos(res.data);
     } catch (err) {
@@ -52,7 +53,7 @@ function App() {
         setEditedTodo("");
         return;
       }
-      axios.put(`http://localhost:5000/todo/${id}`, {
+      axios.put(`${api_url}/todo/${id}`, {
         description: editedTodo,
       });
       setEditingTodo(null);
@@ -66,7 +67,7 @@ function App() {
 
   const deleteTodo = async (id) => {
     try {
-      axios.delete(`http://localhost:5000/todo/${id}`);
+      axios.delete(`${api_url}/todo/${id}`);
       setTodos(todos.filter((todo) => todo.todo_id !== id));
     } catch (err) {
       console.log(err.message);
@@ -77,7 +78,7 @@ function App() {
   const toggleCompleted = async (id) => {
     try {
       const todo = todos.find((todo) => todo.todo_id === id);
-      await axios.put(`http://localhost:5000/todo/${id}`, {
+      await axios.put(`${api_url}/todo/${id}`, {
         description: todo.description,
         completed: !todo.completed,
       });
