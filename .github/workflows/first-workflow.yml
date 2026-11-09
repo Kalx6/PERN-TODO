@@ -1,0 +1,22 @@
+name: My First Workflow
+
+on: push
+
+jobs:
+  say-hello:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print a greeting
+        run: echo "Hello from GitHub Actions!"
+
+      - name: Download my code
+        uses: actions/checkout@v4
+
+      - name: Show files in the repo
+        run: ls -la
+
+      - name: Run several commands
+        run: |
+          echo "Node version:"
+          node --version
+          echo "Done!"

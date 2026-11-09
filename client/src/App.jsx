@@ -20,10 +20,10 @@ function App() {
     setDescription("");
     getTodos();
 
-    try {
-    } catch (err) {
-      console.log(err.message);
-    }
+    // try {
+    // } catch (err) {
+    //   console.log(err.message);
+    // }
   };
 
   // getTodos();
@@ -83,7 +83,7 @@ function App() {
         completed: !todo.completed,
       });
       setTodos(
-        todos.map((todo) =>
+        todos?.map((todo) =>
           todo.todo_id === id ? { ...todo, completed: !todo.completed } : todo,
         ),
       );
@@ -124,7 +124,7 @@ function App() {
             <p className="text-gray-600">No tasks available. Add a new task</p>
           ) : (
             <div className="flex flex-col gap-y-4">
-              {todos.map((todo) => (
+              {Array.isArray(todos) && todos.map((todo) => (
                 <div key={todo.todo_id} className="pb-4">
                   {editingTodo === todo.todo_id ? (
                     <div className="flex items-center gap-x-3">
